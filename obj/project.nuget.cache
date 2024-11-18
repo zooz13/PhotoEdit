@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "S4sT0mUElek=",
+  "success": true,
+  "projectFilePath": "E:\\금오공대\\GUI\\기말프로젝트\\PhotoEdit\\PhotoEdit.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\kaeul\\.nuget\\packages\\materialdesigncolors\\3.1.0\\materialdesigncolors.3.1.0.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\materialdesignthemes\\5.1.0\\materialdesignthemes.5.1.0.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512"
+  ],
+  "logs": []
+}

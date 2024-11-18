@@ -1,0 +1,49 @@
+﻿<Window x:Name="Main" x:Class="PhotoEdit.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PhotoEdit"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="PhotoEdit" Height="450" Width="800" Background="#808080">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <!-- 파일 선택 -->
+        <!-- ToDo 윈도우 밖으로 메뉴가 튀어나가는 거 해결 -->
+        <Border x:Name="FileBox" Grid.Row="0" Grid.ColumnSpan="2">
+            <materialDesign:Card>
+                <Menu materialDesign:MenuAssist.TopLevelMenuItemHeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type materialDesign:Card}}, Path=ActualHeight}" 
+                      FontFamily="Segoe UI"
+                      FontSize="13pt">
+                    <MenuItem Header="File" >
+                        <MenuItem Header="이미지 불러오기"  Click="OpenImage" 
+                                  FontSize="12pt"/>
+                        <MenuItem Header="이미지 저장하기" Click="SaveImage"
+                                  Icon="{materialDesign:PackIcon Kind=ContentSave}" 
+                                  FontSize="12pt"/>
+                        <MenuItem Header="다른 이름으로 저장" Click="SaveAsImage" 
+                                  Icon="{materialDesign:PackIcon Kind=OpenInNew}"
+                                  FontSize="12pt"/>
+                    </MenuItem>
+                    <MenuItem Header="About" />
+                    </Menu>
+            </materialDesign:Card>
+        </Border>
+
+        <!-- 이미지 출력 -->
+        <Border x:Name="ImageBox" Grid.Row="1"  Grid.ColumnSpan="2">
+
+        </Border>
+
+        <!-- 기능 선택 -->
+        <Border x:Name="ToolsBox" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,344,0,0" Grid.RowSpan="2">
+        </Border>
+
+    </Grid>
+</Window>
