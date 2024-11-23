@@ -6,43 +6,167 @@
         xmlns:local="clr-namespace:PhotoEdit"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="PhotoEdit" Height="450" Width="800" Background="#808080">
+        Title="PhotoEdit"  
+        Width="1280" 
+        Height="800" 
+        Background="#606060"
+        FontFamily="{DynamicResource MaterialDesignFont}" Foreground="{x:Null}"
+
+        >
+
+    
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+
         </Grid.RowDefinitions>
 
-        <!-- 파일 선택 -->
+        <!-- 상단 영역 -->
         <!-- ToDo 윈도우 밖으로 메뉴가 튀어나가는 거 해결 -->
-        <Border x:Name="FileBox" Grid.Row="0" Grid.ColumnSpan="2">
+        <Border x:Name="FileBox" Grid.Row="0">
             <materialDesign:Card>
                 <Menu materialDesign:MenuAssist.TopLevelMenuItemHeight="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type materialDesign:Card}}, Path=ActualHeight}" 
-                      FontFamily="Segoe UI"
-                      FontSize="13pt">
+                      FontFamily="Montserrat"
+                      FontSize="12pt">
                     <MenuItem Header="File" >
-                        <MenuItem Header="이미지 불러오기"  Click="OpenImage" 
-                                  FontSize="12pt"/>
-                        <MenuItem Header="이미지 저장하기" Click="SaveImage"
-                                  Icon="{materialDesign:PackIcon Kind=ContentSave}" 
+                        <MenuItem Header="새 이미지"  Click="OpenImage" 
                                   FontSize="12pt"/>
                         <MenuItem Header="다른 이름으로 저장" Click="SaveAsImage" 
-                                  Icon="{materialDesign:PackIcon Kind=OpenInNew}"
+                                  Icon="{materialDesign:PackIcon Kind='ContentSaveOutline'}"
                                   FontSize="12pt"/>
                     </MenuItem>
-                    <MenuItem Header="About" />
-                    </Menu>
+                </Menu>
             </materialDesign:Card>
         </Border>
 
-        <!-- 이미지 출력 -->
-        <Border x:Name="ImageBox" Grid.Row="1"  Grid.ColumnSpan="2">
+        <!-- 중간 영역 -->
+        <Border x:Name="ImageBox" Grid.Row="1" ClipToBounds="True">
+            <Grid>
+                <!-- 중간 영역을 3부분으로 나누기 -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
 
+                <!-- 기능 선택 -->
+                <Grid Grid.Column="0">
+                    <Border x:Name="Select">
+                        <materialDesign:Card x:Name="Selector"
+                              Padding="8"
+                              Background="{DynamicResource MaterialDesignDarkSeparatorBackground}"
+                              Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                              UniformCornerRadius="17" 
+                                Width="70"
+                                Height="150" BorderBrush="{x:Null}">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" >
+                                <!-- 조절 버튼 -->
+                                <Button Width="50" Height="50" 
+                                         materialDesign:ButtonAssist.CornerRadius="25">
+                                    <Button.Background>
+                                        <ImageBrush ImageSource="pack://application:,,,/Icon/dial.png" Stretch="UniformToFill" />
+                                    </Button.Background>
+                                </Button>
+                                <!-- 자르기 버튼-->
+                                <Button Content="버튼 B" Width="50" Height="40" Margin="0,5" />
+                            </StackPanel>
+
+                        </materialDesign:Card>
+                    </Border>
+                </Grid>
+
+                <!-- 이미지 표시 -->
+                <Grid Grid.Column="1">
+                    <Border x:Name="ImageSheet"  Background="#808080" >
+                        <Image x:Name="ImageDisplay1" Stretch="Uniform" RenderTransformOrigin="0.5,0.5" 
+                                 MouseWheel="Image_MouseWheel" Margin="20,0">
+                            <Image.RenderTransform>
+                                <ScaleTransform x:Name="ImageScaleTransform" ScaleX="1" ScaleY="1" />
+                            </Image.RenderTransform>
+                        </Image>
+
+                    </Border>
+
+                    <Button x:Name="LoadImgButton" Content="새 이미지" Width="110" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Panel.ZIndex="1" Click="LoadImgButton_Click" 
+                         FontFamily="Montserrat" Foreground="White" BorderBrush="#FF673AB7" Background="#FF673AB7"
+                            />
+                </Grid>
+
+                <!-- 값 조절 -->
+                <Grid x:Name="SliderGrid" Grid.Column="2">
+                    
+                    <!-- 기능-->
+
+                    <Border x:Name="tools">
+                        <materialDesign:Card x:Name="ToolBox"
+                                  Padding="8"
+                                  Background="{DynamicResource MaterialDesignDarkSeparatorBackground}"
+                                  Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                                  UniformCornerRadius="17"
+                                    Height="500" BorderBrush="{x:Null}" Margin="38,65,86,64"
+                                             Panel.ZIndex="1">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" >
+                                <!-- 노출 -->
+                                <Button x:Name="ExposureButton" Content="노출" Width="50" Height="50" 
+                                     materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" Click="ExposureButton_Click" Background="#FF673AB7" BorderBrush="#FF673AB7"
+                                        />
+                                <!-- 그림자 -->
+                                <Button x:Name="ShadowButton" Content="그림자" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"
+                                         Click="ShadowButton_Click"
+                                        />
+                                
+                                <!-- 밝기 -->
+                                <Button x:Name="BrightnessButton" Content="밝기" Width="50" Height="50" 
+     materialDesign:ButtonAssist.CornerRadius="25"  Click="BrightnessButton_Click"  Margin="0,10,0,10"/>
+
+                                <!-- 대비 -->
+                                <Button x:Name="ContrastButton" Content="대비" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" />                              
+                                    
+                                <!-- 채도 -->
+                                <Button x:Name="ChromaButton" Content="채도" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"/>
+                                
+                                <!-- 하이라이트 -->
+                                <Button x:Name="HighlightButton" Content="하이라이트" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="HighlightButton_Click"/>
+
+                                <!-- 색온도 -->
+                                <Button x:Name="ColorTmpButton" Content="대비" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" />
+
+                            </StackPanel>
+                        </materialDesign:Card>
+
+                    </Border>
+
+
+                    <!-- 슬라이더 -->
+                    <Slider
+    x:Name="Slider" 
+     materialDesign:SliderAssist.HideActiveTrack="True"
+     Maximum="100"
+     Minimum="-100"
+     Orientation="Vertical"
+     Style="{StaticResource MaterialDesignDiscreteSlider}"
+     TickFrequency="{Binding DiscreteVertical.TickFrequency}"
+     TickPlacement="BottomRight"
+     Value="0"                         
+   Height="550" Margin="134,40,29,39" Foreground="#FF3D0076"
+ValueChanged="Slider_ValueChanged"
+
+   />
+                </Grid>
+            </Grid>
         </Border>
 
-        <!-- 기능 선택 -->
-        <Border x:Name="ToolsBox" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,344,0,0" Grid.RowSpan="2">
+
+        <!-- 하단 영역 -->
+        <Border Grid.Row="2">            
         </Border>
 
     </Grid>

@@ -1,12 +1,19 @@
 {
   "version": 2,
-  "dgSpecHash": "S4sT0mUElek=",
+  "dgSpecHash": "uGA5Hp24UvY=",
   "success": true,
   "projectFilePath": "E:\\금오공대\\GUI\\기말프로젝트\\PhotoEdit\\PhotoEdit.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\kaeul\\.nuget\\packages\\materialdesigncolors\\3.1.0\\materialdesigncolors.3.1.0.nupkg.sha512",
     "C:\\Users\\kaeul\\.nuget\\packages\\materialdesignthemes\\5.1.0\\materialdesignthemes.5.1.0.nupkg.sha512",
-    "C:\\Users\\kaeul\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512"
+    "C:\\Users\\kaeul\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\opencvsharp4\\4.10.0.20241108\\opencvsharp4.4.10.0.20241108.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\opencvsharp4.extensions\\4.10.0.20241108\\opencvsharp4.extensions.4.10.0.20241108.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\opencvsharp4.runtime.win\\4.10.0.20241108\\opencvsharp4.runtime.win.4.10.0.20241108.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\system.drawing.common\\8.0.0\\system.drawing.common.8.0.0.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\kaeul\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
   ],
   "logs": []
 }

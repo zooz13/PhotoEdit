@@ -1,22 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\",
+  "WorkspaceRootPath": "E:\\20210298\\PhotoEdit\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|e:\\\uAE08\uC624\uACF5\uB300\\gui\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\photoedit\\mainwindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|solutionrelative:mainwindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\20210298\\PhotoEdit\\MainWindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MainWindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|e:\\\uAE08\uC624\uACF5\uB300\\gui\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\photoedit\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\20210298\\PhotoEdit\\MainWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MainWindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|e:\\\uAE08\uC624\uACF5\uB300\\gui\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\photoedit\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|solutionrelative:mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\20210298\\PhotoEdit\\App.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:App.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|e:\\\uAE08\uC624\uACF5\uB300\\gui\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\photoedit\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{888307D1-A327-4F3B-8092-71CA8F6ECA8F}|PhotoEdit.csproj|solutionrelative:app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\20210298\\PhotoEdit\\MainWindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MainWindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,16 +26,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "App.xaml",
-              "DocumentMoniker": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\App.xaml",
+              "DocumentMoniker": "E:\\20210298\\PhotoEdit\\App.xaml",
               "RelativeDocumentMoniker": "App.xaml",
-              "ToolTip": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\App.xaml",
+              "ToolTip": "E:\\20210298\\PhotoEdit\\App.xaml",
               "RelativeToolTip": "App.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2024-11-18T13:41:32.216Z",
               "IsPinned": true,
@@ -47,25 +48,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml",
-              "DocumentMoniker": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\MainWindow.xaml",
+              "DocumentMoniker": "E:\\20210298\\PhotoEdit\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
-              "ToolTip": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\MainWindow.xaml",
+              "ToolTip": "E:\\20210298\\PhotoEdit\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2024-11-18T13:40:52.206Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\MainWindow.xaml.cs",
+              "DocumentMoniker": "E:\\20210298\\PhotoEdit\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "MainWindow.xaml.cs",
-              "ToolTip": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\MainWindow.xaml.cs",
+              "ToolTip": "E:\\20210298\\PhotoEdit\\MainWindow.xaml.cs",
               "RelativeToolTip": "MainWindow.xaml.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAuwCAAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-18T14:27:59.515Z",
               "EditorCaption": ""
@@ -93,11 +95,11 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "MainWindow.xaml",
-              "DocumentMoniker": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\MainWindow.xaml",
+              "DocumentMoniker": "E:\\20210298\\PhotoEdit\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MainWindow.xaml",
-              "ToolTip": "E:\\\uAE08\uC624\uACF5\uB300\\GUI\\\uAE30\uB9D0\uD504\uB85C\uC81D\uD2B8\\PhotoEdit\\MainWindow.xaml",
+              "ToolTip": "E:\\20210298\\PhotoEdit\\MainWindow.xaml",
               "RelativeToolTip": "MainWindow.xaml",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAADEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
