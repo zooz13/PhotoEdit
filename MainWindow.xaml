@@ -125,19 +125,19 @@ materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"
 
                                 <!-- 대비 -->
                                 <Button x:Name="ContrastButton" Content="대비" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" />                              
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ContrastButton_Click" />                              
                                     
                                 <!-- 채도 -->
                                 <Button x:Name="ChromaButton" Content="채도" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"/>
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ChromaButton_Click"/>
                                 
                                 <!-- 하이라이트 -->
                                 <Button x:Name="HighlightButton" Content="하이라이트" Width="50" Height="50" 
 materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="HighlightButton_Click"/>
 
                                 <!-- 색온도 -->
-                                <Button x:Name="ColorTmpButton" Content="대비" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" />
+                                <Button x:Name="ColorTmpButton" Content="색온도" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ColorTmpButton_Click" />
 
                             </StackPanel>
                         </materialDesign:Card>

@@ -14,18 +14,20 @@ using System.Windows.Shapes;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
+using System.Printing;
 
 namespace PhotoEdit
 {
     public struct Option
     {
         public int Exposure { get; set; }
-        public int Brightness { get; set; }
-
-        public int Highlight { get; set; }     
-        
         public int Shadow { get; set; }
-
+        public int Brightness { get; set; }
+        public int Contrast { get; set; }
+        public int Chroma { get; set; }
+        public int Highlight { get; set; }     
+        public int ColorTmp { get; set; }    
     }
 
     public partial class MainWindow : System.Windows.Window
@@ -44,7 +46,6 @@ namespace PhotoEdit
         {
             InitializeComponent();
         }
-
 
         // 이미지 불러오기
         private void OpenImage(object sender, RoutedEventArgs e)
@@ -154,13 +155,15 @@ namespace PhotoEdit
             }
         }
 
-
-        //추가 효과 처리 함수들
-
         // 버튼 클릭
         private void ExposureButton_Click(object sender, RoutedEventArgs e)
         {
             currentEffect = "Exposure";
+            UpdateSliderForCurrentEffect();
+        }
+        private void ShadowButton_Click(object sender, RoutedEventArgs e)
+        {
+            currentEffect = "Shadow";
             UpdateSliderForCurrentEffect();
         }
 
@@ -170,17 +173,28 @@ namespace PhotoEdit
             UpdateSliderForCurrentEffect();
         }
 
+        private void ContrastButton_Click(object sender, RoutedEventArgs e)
+        {
+            currentEffect = "Contrast";
+            UpdateSliderForCurrentEffect();
+        }
+
         private void HighlightButton_Click(object sender, RoutedEventArgs e)
         {
             currentEffect = "Highlight";
             UpdateSliderForCurrentEffect();
         }
-
-        private void ShadowButton_Click(object sender, RoutedEventArgs e)
+        private void ChromaButton_Click(object sender, RoutedEventArgs e)
         {
-            currentEffect = "Shadow";
+            currentEffect = "Chroma";
             UpdateSliderForCurrentEffect();
         }
+
+        private void ColorTmpButton_Click(object sender, RoutedEventArgs e)
+        {
+            currentEffect = "ColorTmp";
+            UpdateSliderForCurrentEffect();
+        }        
 
         // 버튼 클릭 시 해당 효과에 맞는 슬라이더 값 업데이트
         private void UpdateSliderForCurrentEffect()
@@ -190,15 +204,25 @@ namespace PhotoEdit
                 case "Exposure":
                     Slider.Value = currentOptions.Exposure;
                     break;
+                case "Shadow":
+                    Slider.Value = currentOptions.Shadow;
+                    break;
                 case "Brightness":
                     Slider.Value = currentOptions.Brightness;
+                    break;
+                case "Contrast":
+                    Slider.Value = currentOptions.Contrast;
+                    break;
+                case "Chroma":
+                    Slider.Value = currentOptions.Contrast;
                     break;
                 case "Hightlight":
                     Slider.Value = currentOptions.Highlight;
                     break;
-                case "Shadow":
-                    Slider.Value = currentOptions.Shadow;
+                case "ColorTmp":
+                    Slider.Value = currentOptions.Highlight;
                     break;
+                
             }
 
         }
@@ -214,15 +238,27 @@ namespace PhotoEdit
                     case "Exposure":
                         currentOptions.Exposure = (int)e.NewValue; // 'double'을 'int'로 변환
                         break;
-                    case "Brightness":
-                        currentOptions.Brightness = (int)e.NewValue; // 'double'을 'int'로 변환
-                        break;
-                    case "Hightlight":
-                        currentOptions.Highlight = (int)e.NewValue; // 'double'을 'int'로 변환
-                        break;
                     case "Shadow":
                         currentOptions.Shadow = (int)e.NewValue; // 'double'을 'int'로 변환
                         break;
+                    case "Brightness":
+                        currentOptions.Brightness = (int)e.NewValue; // 'double'을 'int'로 변환
+                        break;
+                    case "Contrast":
+                        currentOptions.Contrast = (int)e.NewValue; // 'double'을 'int'로 변환
+                        break;
+                    case "Chroma":
+                        currentOptions.Chroma = (int)e.NewValue; // 'double'을 'int'로 변환
+                        break;
+                    
+                    case "Hightlight":
+                        currentOptions.Highlight = (int)e.NewValue; // 'double'을 'int'로 변환
+                        break;
+
+                    case "ColorTmp":
+                        currentOptions.ColorTmp = (int)e.NewValue; // 'double'을 'int'로 변환
+                        break;
+                    
                 }
 
                 ApplyAllEffects();
@@ -241,9 +277,12 @@ namespace PhotoEdit
 
             // 순차적으로 효과를 적용
             adjustedImage = ApplyExposure(adjustedImage, currentOptions.Exposure);
-            adjustedImage = ApplyBrightness(adjustedImage, currentOptions.Brightness);
-            adjustedImage = ApplyHighlight(adjustedImage, currentOptions.Brightness);
             adjustedImage = ApplyShadow(adjustedImage, currentOptions.Shadow);
+            adjustedImage = ApplyContrast(adjustedImage, currentOptions.Contrast);
+            adjustedImage = ApplyBrightness(adjustedImage, currentOptions.Brightness);
+            adjustedImage = ApplyChroma(adjustedImage, currentOptions.Chroma);
+            adjustedImage = ApplyHighlight(adjustedImage, currentOptions.Brightness);
+            adjustedImage = ApplyColorTmp(adjustedImage, currentOptions.ColorTmp);
 
             // 결과 이미지를 WPF 이미지 컨트롤에 표시
             ImageDisplay1.Source = MatToBitmapImage(adjustedImage);
@@ -252,52 +291,26 @@ namespace PhotoEdit
             currentImage = adjustedImage;
         }
 
-        // 노출 LUT 캐싱 변수
-        private readonly Dictionary<int, Mat> exposureLUTCache = new Dictionary<int, Mat>();
-
-        // 노출 LUT 가져오기 (근사 값 캐싱)
-        private Mat GetExposureLUT(int exposureValue)
+        // 노출 변경 (감마값 기반)
+        private Mat ApplyExposure(Mat inputImage, int exposureValue)
         {
-            // 슬라이더 값을 5단위로 근사화
-            int approximatedValue = (int)(Math.Round(exposureValue / 5.0) * 5);
-
-            if (!exposureLUTCache.ContainsKey(approximatedValue))
+            if (inputImage == null)
             {
-                // LUT 생성 후 캐싱
-                exposureLUTCache[approximatedValue] = GenerateExposureLUT(approximatedValue);
-
-                // 캐싱된 LUT가 너무 많아지면 가장 오래된 항목 제거
-                if (exposureLUTCache.Count > 20) // 캐싱 개수 제한
-                {
-                    int oldestKey = exposureLUTCache.Keys.First();
-                    exposureLUTCache[oldestKey].Dispose(); // 메모리 해제
-                    exposureLUTCache.Remove(oldestKey);
-                }
+                throw new ArgumentNullException(nameof(inputImage), "입력된 이미지가 null입니다.");
             }
-            return exposureLUTCache[approximatedValue];
-        }
 
-        // LUT 생성 함수
-        private Mat GenerateExposureLUT(int exposureValue)
-        {
-            // 감마 조정 값 계산
-            double gamma = 1.0 - (exposureValue * 0.005); // 감마 범위: 0.95 ~ 1.05
+            // 감마 조정 값 계산 (슬라이더 값: -100 ~ 100 → 감마 범위: 0.5 ~ 1.5)
+            double gamma = 1.0 - (exposureValue * 0.005); // 감마값 계산
 
-            // LUT 생성
+
+            // LUT(룩업 테이블) 생성
             Mat lut = new Mat(1, 256, MatType.CV_8U);
             for (int i = 0; i < 256; i++)
             {
-                double adjustedValue = Math.Pow(i / 255.0, gamma) * 255.0;
-                lut.Set(0, i, (byte)Math.Clamp(adjustedValue, 0, 255));
+                double normalizedValue = i / 255.0; // 0~255 값을 0~1로 정규화
+                double adjustedValue = Math.Pow(normalizedValue, gamma) * 255.0; // 감마 보정
+                lut.Set(0, i, (byte)Math.Clamp(adjustedValue, 0, 255)); // 0~255로 제한
             }
-            return lut;
-        }
-
-        // 노출 변경 함수
-        private Mat ApplyExposure(Mat inputImage, int exposureValue)
-        {
-            // LUT 가져오기
-            Mat lut = GetExposureLUT(exposureValue);
 
             // LUT를 사용하여 노출 조정
             Mat adjustedImage = new Mat();
@@ -306,31 +319,26 @@ namespace PhotoEdit
             return adjustedImage;
         }
 
-        // 밝기 LUT 생성 함수
-        private Mat GenerateBrightnessLUT(int brightnessValue)
-        {
-            Mat lut = new Mat(1, 256, MatType.CV_8U);
-            double brightnessAdjustment = brightnessValue * 0.5;
-
-            for (int i = 0; i < 256; i++)
-            {
-                // 각 픽셀 값에 밝기 조정을 적용
-                int adjustedValue = (int)(i + brightnessAdjustment);
-                lut.Set(0, i, (byte)Math.Clamp(adjustedValue, 0, 255)); // 0~255로 제한
-            }
-
-            return lut;
-        }
-
-        // 밝기 변경 함수
+        // 밝기 변경
         private Mat ApplyBrightness(Mat inputImage, int brightnessValue)
         {
-            // LUT 생성
-            Mat brightnessLUT = GenerateBrightnessLUT(brightnessValue);
+            // 밝기 조정 값 계산 (슬라이더 값: -100 ~ 100)
+            double brightnessAdjustment = brightnessValue * 0.5;
 
-            // LUT 적용
+            // 부동 소수점 형식으로 변환 (연산을 위해)
+            Mat floatImage = new Mat();
+            inputImage.ConvertTo(floatImage, MatType.CV_32F);
+
+            // 밝기 조정: 모든 픽셀에 동일한 값을 더함
             Mat adjustedImage = new Mat();
-            Cv2.LUT(inputImage, brightnessLUT, adjustedImage);
+            Cv2.Add(floatImage, new Scalar(brightnessAdjustment, brightnessAdjustment, brightnessAdjustment), adjustedImage);
+
+            // 값이 0~255 범위를 초과하지 않도록 클램핑
+            Cv2.Min(adjustedImage, new Scalar(255, 255, 255), adjustedImage);
+            Cv2.Max(adjustedImage, new Scalar(0, 0, 0), adjustedImage);
+
+            // 다시 8비트 형식으로 변환
+            adjustedImage.ConvertTo(adjustedImage, MatType.CV_8U);
 
             return adjustedImage;
         }
@@ -436,5 +444,94 @@ namespace PhotoEdit
             return adjustedImage;
         }
 
+        // 대비 변경
+        private Mat ApplyContrast(Mat inputImage, int contrastValue)
+        {
+            // 대비 조정 값 계산 (슬라이더 값: -100 ~ 100 → 조정 강도)
+            double contrastFactor = 1.0 + (contrastValue / 250.0); // -100 ~ 100 -> 0.0 ~ 2.0
+            contrastFactor = Math.Clamp(contrastFactor, 0.0, 3.0); // 대비 조정 범위 제한 (0.0 ~ 3.0)
+
+            // 이미지 평균값 계산 (중립 점 설정)
+            Scalar mean = Cv2.Mean(inputImage);
+
+            // 대비 조정
+            Mat adjustedImage = new Mat();
+            inputImage.ConvertTo(adjustedImage, MatType.CV_32F); // 부동 소수점 변환
+            Cv2.Subtract(adjustedImage, new Scalar(mean.Val0, mean.Val1, mean.Val2), adjustedImage); // 평균값을 기준으로 이동
+            Cv2.Multiply(adjustedImage, contrastFactor, adjustedImage); // 대비 확장 또는 축소
+            Cv2.Add(adjustedImage, new Scalar(mean.Val0, mean.Val1, mean.Val2), adjustedImage); // 원래 위치로 복원
+
+            // 값 클램핑 및 다시 8비트 변환
+            adjustedImage.ConvertTo(adjustedImage, MatType.CV_8U, 1.0, 0);
+
+            return adjustedImage;
+        }
+
+        // 채도변경
+        private Mat ApplyChroma(Mat inputImage, int chromaValue)
+        {
+            if (inputImage == null)
+            {
+                throw new ArgumentNullException(nameof(inputImage), "입력된 이미지가 null입니다.");
+            }
+
+            // 슬라이더 값 (-100 ~ 100)을 이용해 채도 조정 비율 계산
+            double chromaFactor = 1.0 + (chromaValue / 100.0); // -100 ~ 100 → 0.0 ~ 2.0
+            chromaFactor = Math.Clamp(chromaFactor, 0.0, 2.0); // 채도 조정 범위 제한 (0.0 ~ 2.0)
+
+            // BGR 이미지를 HSV 색 공간으로 변환
+            Mat hsvImage = new Mat();
+            Cv2.CvtColor(inputImage, hsvImage, ColorConversionCodes.BGR2HSV);
+
+            // HSV 이미지를 분리 (H, S, V)
+            Mat[] hsvChannels = Cv2.Split(hsvImage);
+
+            // S (채도) 채널 조정
+            Cv2.Multiply(hsvChannels[1], chromaFactor, hsvChannels[1]); // 채도에 chromaFactor를 곱함
+            Cv2.Min(hsvChannels[1], new Scalar(255), hsvChannels[1]);   // 값 제한 (0 ~ 255)
+
+            // 조정된 채널 병합
+            Cv2.Merge(hsvChannels, hsvImage);
+
+            // HSV 이미지를 BGR로 다시 변환
+            Mat adjustedImage = new Mat();
+            Cv2.CvtColor(hsvImage, adjustedImage, ColorConversionCodes.HSV2BGR);
+
+            return adjustedImage;
+        }
+
+        // 색온도 변경
+        private Mat ApplyColorTmp(Mat inputImage, int tempValue)
+        {
+            if (inputImage == null)
+            {
+                throw new ArgumentNullException(nameof(inputImage), "입력된 이미지가 null입니다.");
+            }
+
+            // 슬라이더 값 (-100 ~ 100)을 이용해 RGB 가중치 계산
+            double redAdjustment = 1.0 + (tempValue * 0.005); // 온도를 높이면 빨간색 강화
+            double blueAdjustment = 1.0 - (tempValue * 0.005); // 온도를 낮추면 파란색 강화
+
+            // 가중치 클램핑 (0.0 ~ 2.0 범위)
+            redAdjustment = Math.Clamp(redAdjustment, 0.0, 1.0);
+            blueAdjustment = Math.Clamp(blueAdjustment, 0.0, 1.0);
+
+            // BGR 채널 분리
+            Mat[] channels = Cv2.Split(inputImage);
+
+            // 빨간색 채널 조정
+            Cv2.Multiply(channels[2], redAdjustment, channels[2]); // Red 채널
+            Cv2.Min(channels[2], new Scalar(255), channels[2]);    // 값 제한
+
+            // 파란색 채널 조정
+            Cv2.Multiply(channels[0], blueAdjustment, channels[0]); // Blue 채널
+            Cv2.Min(channels[0], new Scalar(255), channels[0]);     // 값 제한
+
+            // 채널 병합
+            Mat adjustedImage = new Mat();
+            Cv2.Merge(channels, adjustedImage);
+
+            return adjustedImage;
+        }
     }
 }
