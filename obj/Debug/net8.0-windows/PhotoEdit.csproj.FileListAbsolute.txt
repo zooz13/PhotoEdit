@@ -6,6 +6,12 @@ E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\PhotoE
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\MaterialDesignColors.dll
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\MaterialDesignThemes.Wpf.dll
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\Microsoft.Xaml.Behaviors.dll
+E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\OpenCvSharp.dll
+E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\OpenCvSharp.Extensions.dll
+E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x64\native\OpenCvSharpExtern.dll
+E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x64\native\opencv_videoio_ffmpeg4100_64.dll
+E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x86\native\OpenCvSharpExtern.dll
+E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x86\native\opencv_videoio_ffmpeg4100.dll
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\PhotoEdit.csproj.AssemblyReference.cache
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\App.baml
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\MainWindow.g.cs
@@ -24,9 +30,3 @@ E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\refint
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\PhotoEdit.pdb
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\PhotoEdit.genruntimeconfig.cache
 E:\금오공대\GUI\기말프로젝트\PhotoEdit\obj\Debug\net8.0-windows\ref\PhotoEdit.dll
-E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\OpenCvSharp.dll
-E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\OpenCvSharp.Extensions.dll
-E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x64\native\OpenCvSharpExtern.dll
-E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x64\native\opencv_videoio_ffmpeg4100_64.dll
-E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x86\native\OpenCvSharpExtern.dll
-E:\금오공대\GUI\기말프로젝트\PhotoEdit\bin\Debug\net8.0-windows\runtimes\win-x86\native\opencv_videoio_ffmpeg4100.dll

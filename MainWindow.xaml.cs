@@ -16,6 +16,7 @@ using OpenCvSharp.Extensions;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
 using System.Printing;
+using Rect = OpenCvSharp.Rect;
 
 namespace PhotoEdit
 {
@@ -26,8 +27,8 @@ namespace PhotoEdit
         public int Brightness { get; set; }
         public int Contrast { get; set; }
         public int Chroma { get; set; }
-        public int Highlight { get; set; }     
-        public int ColorTmp { get; set; }    
+        public int Highlight { get; set; }
+        public int ColorTmp { get; set; }
     }
 
     public partial class MainWindow : System.Windows.Window
@@ -41,10 +42,16 @@ namespace PhotoEdit
 
         // 현재 활성화된 버튼을 추적하는 변수
         private Button currentActiveButton = null;
+        private Button currentOptionButton = null;
+
+        private bool isCroped = false;
+        private bool isRotate = false;
+
 
         public MainWindow()
         {
             InitializeComponent();
+            currentActiveButton = AdjustButton; // 기본 활성 버튼 설정
         }
 
         // 이미지 불러오기
@@ -63,7 +70,12 @@ namespace PhotoEdit
                     originalImage = Cv2.ImRead(currentFilePath); // OpenCV Mat로 이미지 읽기
                     currentImage = originalImage.Clone();
                     ImageDisplay1.Source = MatToBitmapImage(currentImage); // WPF에 표시
-                    // 구조체 초기화 함수 구현해야함
+
+                    // 저장 버튼 비활성화
+                    SaveButton.Visibility = Visibility.Collapsed;
+                    // 구조체 초기화
+                    InitializeOptions();
+
                 }
                 catch (Exception ex)
                 {
@@ -72,24 +84,21 @@ namespace PhotoEdit
             }
         }
 
-        // 이미지 저장하기
-        private void SaveImage(object sender, RoutedEventArgs e)
+        // 설정값 초기화 함수
+        private void InitializeOptions()
         {
-            if (currentImage == null || string.IsNullOrEmpty(currentFilePath))
+            currentOptions = new Option
             {
-                MessageBox.Show("저장할 이미지가 없습니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+                Exposure = 0,
+                Shadow = 0,
+                Brightness = 0,
+                Contrast = 0,
+                Chroma = 0,
+                Highlight = 0,
+                ColorTmp = 0
+            };
 
-            try
-            {
-                Cv2.ImWrite(currentFilePath, currentImage); // OpenCV Mat 저장
-                MessageBox.Show("이미지가 성공적으로 저장되었습니다.", "알림", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"이미지를 저장하는 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            currentEffect = "Exposure"; // 기본 효과 설정
         }
 
         // 다른 이름으로 저장하기
@@ -120,6 +129,11 @@ namespace PhotoEdit
             }
         }
 
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveAsImage(sender, e);
+        }
+
         // OpenCV Mat → BitmapImage 변환
         private BitmapImage MatToBitmapImage(Mat mat)
         {
@@ -139,11 +153,6 @@ namespace PhotoEdit
             }
         }
 
-        // 이미지 크기 조절 (마우스 위치 중심 확대)
-        private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-        }
-
         // 초기 화면 이미지 불러오기 버튼
         private void LoadImgButton_Click(object sender, RoutedEventArgs e)
         {
@@ -155,47 +164,138 @@ namespace PhotoEdit
             }
         }
 
-        // 버튼 클릭
+        // 기능 버튼 클릭
         private void ExposureButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Exposure";
             UpdateSliderForCurrentEffect();
+
         }
+
         private void ShadowButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Shadow";
             UpdateSliderForCurrentEffect();
         }
 
         private void BrightnessButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Brightness";
             UpdateSliderForCurrentEffect();
         }
 
         private void ContrastButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Contrast";
             UpdateSliderForCurrentEffect();
         }
 
         private void HighlightButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Highlight";
             UpdateSliderForCurrentEffect();
         }
+
         private void ChromaButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Chroma";
             UpdateSliderForCurrentEffect();
         }
 
         private void ColorTmpButton_Click(object sender, RoutedEventArgs e)
         {
+            UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "ColorTmp";
             UpdateSliderForCurrentEffect();
-        }        
+        }
 
+        private void FlipButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentImage == null)
+            {
+                return;
+            }
+
+            // 상하 대칭
+            Mat flippedImage = new Mat();
+            Cv2.Flip(currentImage, flippedImage, FlipMode.X);
+
+            currentImage = flippedImage.Clone();
+            ImageDisplay1.Source = MatToBitmapImage(flippedImage);
+
+            // 원본 이미지 업데이트 여부 (선택 사항)
+            Cv2.Flip(originalImage, flippedImage, FlipMode.X); // 0은 상하 대칭
+            originalImage = flippedImage.Clone();
+
+            isRotate = true;
+        }
+
+        private void MirrorButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentImage == null)
+            {
+                return;
+            }
+
+            // 좌우 대칭 처리
+            Mat flippedImage = new Mat();
+            Cv2.Flip(currentImage, flippedImage, FlipMode.Y);
+
+            currentImage = flippedImage.Clone();
+            ImageDisplay1.Source = MatToBitmapImage(flippedImage);
+
+            // 원본 업데이트
+            Cv2.Flip(originalImage, flippedImage, FlipMode.Y);
+            originalImage = flippedImage.Clone();
+
+            isRotate = true;
+        }
+
+        private void RotateRightButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentImage == null)
+            {
+                return;
+            }
+
+            Mat rotatedImage = new Mat();
+            Cv2.Rotate(currentImage, rotatedImage, RotateFlags.Rotate90Clockwise);
+
+            currentImage = rotatedImage.Clone();
+            ImageDisplay1.Source = MatToBitmapImage(rotatedImage);
+
+            // 원본 업데이트
+            Cv2.Rotate(originalImage, rotatedImage, RotateFlags.Rotate90Clockwise);
+            originalImage = rotatedImage.Clone();
+
+            isRotate = true;
+        }
+
+        private void RotateLeftButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentImage == null)
+            {
+                return;
+            }
+
+            Mat rotatedImage = new Mat();
+            Cv2.Rotate(currentImage, rotatedImage, RotateFlags.Rotate90Counterclockwise);
+
+            currentImage = rotatedImage.Clone();
+            ImageDisplay1.Source = MatToBitmapImage(rotatedImage);
+
+            // 원본 업데이트
+            Cv2.Rotate(originalImage, rotatedImage, RotateFlags.Rotate90Counterclockwise);
+            originalImage = rotatedImage.Clone();
+
+            isRotate = true;
+        }
         // 버튼 클릭 시 해당 효과에 맞는 슬라이더 값 업데이트
         private void UpdateSliderForCurrentEffect()
         {
@@ -214,15 +314,15 @@ namespace PhotoEdit
                     Slider.Value = currentOptions.Contrast;
                     break;
                 case "Chroma":
-                    Slider.Value = currentOptions.Contrast;
+                    Slider.Value = currentOptions.Chroma;
                     break;
                 case "Hightlight":
                     Slider.Value = currentOptions.Highlight;
                     break;
                 case "ColorTmp":
-                    Slider.Value = currentOptions.Highlight;
+                    Slider.Value = currentOptions.ColorTmp;
                     break;
-                
+
             }
 
         }
@@ -250,7 +350,7 @@ namespace PhotoEdit
                     case "Chroma":
                         currentOptions.Chroma = (int)e.NewValue; // 'double'을 'int'로 변환
                         break;
-                    
+
                     case "Hightlight":
                         currentOptions.Highlight = (int)e.NewValue; // 'double'을 'int'로 변환
                         break;
@@ -258,7 +358,9 @@ namespace PhotoEdit
                     case "ColorTmp":
                         currentOptions.ColorTmp = (int)e.NewValue; // 'double'을 'int'로 변환
                         break;
-                    
+                    case "Rotate":
+                        ApplyRotation(e.NewValue);
+                        return;
                 }
 
                 ApplyAllEffects();
@@ -294,11 +396,6 @@ namespace PhotoEdit
         // 노출 변경 (감마값 기반)
         private Mat ApplyExposure(Mat inputImage, int exposureValue)
         {
-            if (inputImage == null)
-            {
-                throw new ArgumentNullException(nameof(inputImage), "입력된 이미지가 null입니다.");
-            }
-
             // 감마 조정 값 계산 (슬라이더 값: -100 ~ 100 → 감마 범위: 0.5 ~ 1.5)
             double gamma = 1.0 - (exposureValue * 0.005); // 감마값 계산
 
@@ -385,11 +482,6 @@ namespace PhotoEdit
         // 하이라이트 변경
         private Mat ApplyHighlight(Mat inputImage, int highlightValue)
         {
-            if (inputImage == null)
-            {
-                throw new ArgumentNullException(nameof(inputImage), "입력된 이미지가 null입니다.");
-            }
-
             // 이미지를 부동 소수점 형식으로 변환
             Mat floatImage = new Mat();
             inputImage.ConvertTo(floatImage, MatType.CV_32F);
@@ -470,11 +562,6 @@ namespace PhotoEdit
         // 채도변경
         private Mat ApplyChroma(Mat inputImage, int chromaValue)
         {
-            if (inputImage == null)
-            {
-                throw new ArgumentNullException(nameof(inputImage), "입력된 이미지가 null입니다.");
-            }
-
             // 슬라이더 값 (-100 ~ 100)을 이용해 채도 조정 비율 계산
             double chromaFactor = 1.0 + (chromaValue / 100.0); // -100 ~ 100 → 0.0 ~ 2.0
             chromaFactor = Math.Clamp(chromaFactor, 0.0, 2.0); // 채도 조정 범위 제한 (0.0 ~ 2.0)
@@ -533,5 +620,378 @@ namespace PhotoEdit
 
             return adjustedImage;
         }
+
+        // 편집 모드 활성화
+        private void AcitvateEditScreen()
+        {
+            // 윈도우 배경을 검은색으로 변경
+            Main.Background = new SolidColorBrush(Colors.Black);
+
+            // 이미지 배경을 검은색으로 변경
+            ImageSheet.Background = new SolidColorBrush(Colors.Black);
+
+            // 이미지 확대 (예: 1.5배)
+            ImageScaleTransform.ScaleX = 1.05;
+            ImageScaleTransform.ScaleY = 1.05;
+        }
+
+        // 슬라이더 초기 설정
+        private void SetSliderValue()
+        {
+            if (currentActiveButton == TransferButton)
+            {
+                Slider.Minimum = -45;
+                Slider.Maximum = 45;
+                Slider.Value = 0;
+                Slider.Height = 350;
+            }
+            else
+            {
+                Slider.Minimum = -100;
+                Slider.Maximum = 100;
+                Slider.Value = 0;
+                Slider.Height = 550;
+
+            }
+        }
+
+        // 표시할 기능 설정
+        private void SetVisible()
+        {
+            FileBox.Visibility = Visibility.Collapsed;
+            CompleteButton.Visibility = Visibility.Visible;
+            SaveButton.Visibility = Visibility.Collapsed;
+
+            if (currentActiveButton == AdjustButton)
+            {
+                // 활성화
+                currentEffect = "Exposure";
+                Slider.Visibility = Visibility.Visible;
+                tools.Visibility = Visibility.Visible;
+
+                // 숨기기
+                CropCanvas.Visibility = Visibility.Collapsed;
+                SelectionRectangle.Visibility = Visibility.Collapsed;
+                rotation.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                // 활성화
+                rotation.Visibility = Visibility.Visible;
+                Slider.Visibility = Visibility.Visible;
+
+                // 숨기기
+                tools.Visibility = Visibility.Collapsed;
+                ShowSelectionRectangle();
+            }
+        }
+
+        // 조절 버튼
+        private void AdjustButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentImage == null)
+            {
+                return;
+            }
+
+            UpdateButtonBorder((Button)sender, ref currentActiveButton);
+
+            // 슬라이더 초기화
+            SetSliderValue();
+
+            SetVisible();
+
+            // 화면을 검은색으로 설정
+            AcitvateEditScreen();
+        }
+
+        // 자르기 및 회전 버튼
+        private void TransferButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentImage == null)
+            {
+                return;
+            }
+
+            UpdateButtonBorder((Button)sender, ref currentActiveButton);
+
+            currentEffect = "Rotate";
+
+
+            SetSliderValue();
+            SetVisible();
+
+            AcitvateEditScreen();
+        }
+
+        // 슬라이더 회전 처리
+        private void ApplyRotation(double angle)
+        {
+            if (originalImage == null)
+            {
+                return;
+            }
+
+            // 원본 이미지의 중심 좌표 계산
+            Point2f center = new Point2f(originalImage.Width / 2.0f, originalImage.Height / 2.0f);
+
+            // 회전 매트릭스 생성
+            Mat rotationMatrix = Cv2.GetRotationMatrix2D(center, angle, 1.0);
+
+            // 회전된 이미지 저장 변수
+            Mat rotatedImage = new Mat();
+
+            // WarpAffine으로 이미지 회전
+            Cv2.WarpAffine(originalImage, rotatedImage, rotationMatrix, originalImage.Size());
+
+            // 원본 이미지를 업데이트
+            originalImage = rotatedImage;
+
+            // 결과 표시할 이미지 회전
+            Cv2.WarpAffine(currentImage, rotatedImage, rotationMatrix, currentImage.Size());
+            ImageDisplay1.Source = MatToBitmapImage(rotatedImage);
+
+        }
+
+        // 화면 사이즈 얻기
+        private System.Windows.Size GetDisplayedImageSize()
+        {
+            if (ImageDisplay1.Source is BitmapSource bitmapSource)
+            {
+                // 이미지 원본 크기
+                double originalWidth = bitmapSource.PixelWidth;
+                double originalHeight = bitmapSource.PixelHeight;
+
+                // Image 컨트롤의 크기
+                double containerWidth = ImageDisplay1.ActualWidth;
+                double containerHeight = ImageDisplay1.ActualHeight;
+
+                // Uniform 스케일 계산
+                double widthScale = containerWidth / originalWidth;
+                double heightScale = containerHeight / originalHeight;
+
+                // Uniform 특성을 따른 최소 스케일 적용
+                double scale = Math.Min(widthScale, heightScale);
+
+                // 표시 크기 계산
+                double displayedWidth = originalWidth * scale;
+                double displayedHeight = originalHeight * scale;
+
+                return new System.Windows.Size(displayedWidth, displayedHeight);
+            }
+
+            return new System.Windows.Size(0, 0); // 이미지가 없을 경우
+        }
+
+        // 자를 사각형 표시
+        private void ShowSelectionRectangle()
+        {
+            // 표시된 이미지의 실제 크기 가져오기
+            System.Windows.Size displayedSize = GetDisplayedImageSize();
+
+            if (displayedSize.Width <= 0 || displayedSize.Height <= 0)
+            {
+                return;
+            }
+
+            // 캔버스 크기 설정
+            CropCanvas.Width = displayedSize.Width * 1.05;
+            CropCanvas.Height = displayedSize.Height * 1.05;
+
+            // 사각형 크기 설정
+            SelectionRectangle.Width = displayedSize.Width * 1.05;
+            SelectionRectangle.Height = displayedSize.Height * 1.05;
+
+            // 사각형을 캔버스 중앙에 정렬
+            Canvas.SetLeft(SelectionRectangle, (CropCanvas.Width - SelectionRectangle.Width) / 2);
+            Canvas.SetTop(SelectionRectangle, (CropCanvas.Height - SelectionRectangle.Height) / 2);
+
+            // 캔버스 및 사각형 표시
+            CropCanvas.Visibility = Visibility.Visible;
+            SelectionRectangle.Visibility = Visibility.Visible;
+        }
+
+        // 사각형 크기 조절
+        private void CropCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            const double zoomFactor = 0.03; // 크기 조정 비율 (10%씩 확대/축소)
+            double delta = e.Delta > 0 ? 1 + zoomFactor : 1 - zoomFactor; // 휠 방향에 따라 확대 또는 축소
+
+            // 표시된 이미지의 크기 가져오기
+            System.Windows.Size displayedSize = GetDisplayedImageSize();
+            if (displayedSize.Width <= 0 || displayedSize.Height <= 0)
+            {
+                return; // 이미지가 없는 경우 처리하지 않음
+            }
+
+            // 크기 제한 계산
+            const double minSize = 100; // 최소 크기
+            double maxWidth = displayedSize.Width * 1.05; // 이미지 너비를 최대값으로 설정
+            double maxHeight = displayedSize.Height * 1.05; // 이미지 높이를 최대값으로 설정
+
+            // 새로운 캔버스 크기 계산
+            double newWidth = CropCanvas.Width * delta;
+            double newHeight = CropCanvas.Height * delta;
+
+            // 크기 제한 적용
+            newWidth = Math.Clamp(newWidth, minSize, maxWidth);
+            newHeight = Math.Clamp(newHeight, minSize, maxHeight);
+
+            // 캔버스 크기 설정
+            CropCanvas.Width = newWidth;
+            CropCanvas.Height = newHeight;
+
+            // 선택 사각형 크기도 동일 비율로 조정
+            SelectionRectangle.Width = newWidth;
+            SelectionRectangle.Height = newHeight;
+
+            // 선택 사각형을 캔버스 중앙에 유지
+            Canvas.SetLeft(SelectionRectangle, (CropCanvas.Width - SelectionRectangle.Width) / 2);
+            Canvas.SetTop(SelectionRectangle, (CropCanvas.Height - SelectionRectangle.Height) / 2);
+
+            isCroped = true;
+        }
+
+        // 사진 자르기
+        private Mat CropImageByCanvas()
+        {
+            if (currentImage == null || CropCanvas.Visibility != Visibility.Visible)
+            {
+                MessageBox.Show("이미지가 로드되지 않았거나 자르기 사각형이 비활성화되었습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
+
+            // 표시된 이미지의 크기 가져오기
+            System.Windows.Size displayedSize = GetDisplayedImageSize();
+            if (displayedSize.Width <= 0 || displayedSize.Height <= 0)
+            {
+                MessageBox.Show("이미지가 올바르게 표시되지 않았습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
+
+            // 캔버스의 사각형 위치 및 크기 가져오기
+            double rectX = Canvas.GetLeft(SelectionRectangle);
+            double rectY = Canvas.GetTop(SelectionRectangle);
+            double rectWidth = SelectionRectangle.Width;
+            double rectHeight = SelectionRectangle.Height;
+
+            // 이미지 크기 대비 표시된 크기의 비율 계산
+            double widthRatio = originalImage.Width / displayedSize.Width;
+            double heightRatio = originalImage.Height / displayedSize.Height;
+
+            // 사각형 좌표를 원본 이미지 좌표로 변환
+            int cropX = (int)((rectX - (CropCanvas.Width - displayedSize.Width) / 2) * widthRatio);
+            int cropY = (int)((rectY - (CropCanvas.Height - displayedSize.Height) / 2) * heightRatio);
+            int cropWidth = (int)(rectWidth * widthRatio);
+            int cropHeight = (int)(rectHeight * heightRatio);
+
+            // 자르기 영역이 원본 이미지의 범위를 초과하지 않도록 제한
+            cropX = Math.Clamp(cropX, 0, originalImage.Width - 1);
+            cropY = Math.Clamp(cropY, 0, originalImage.Height - 1);
+            cropWidth = Math.Clamp(cropWidth, 1, originalImage.Width - cropX);
+            cropHeight = Math.Clamp(cropHeight, 1, originalImage.Height - cropY);
+
+            // OpenCV Rect 생성
+            Rect cropRect = new Rect(cropX, cropY, cropWidth, cropHeight);
+
+            // 이미지 자르기
+            Mat croppedImage = new Mat(originalImage, cropRect);
+
+            isCroped = true;
+
+            return croppedImage;
+        }
+
+        // 완료 버튼
+        private void CompleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            // 자르기 했다면
+            if (isCroped)
+            {
+                // 자르기 영역 계산 및 이미지 자르기
+                Mat croppedImage = CropImageByCanvas();
+                if (croppedImage != null)
+                {
+                    // 자른 이미지를 UI에 반영
+                    currentImage = croppedImage;
+                    originalImage = croppedImage.Clone();
+                    ImageDisplay1.Source = MatToBitmapImage(croppedImage);
+
+                    // 자르기 캔버스 숨기기
+                    CropCanvas.Visibility = Visibility.Collapsed;
+                    isCroped = false; // 상태 초기화 
+                }
+                else
+                {
+                    isCroped = false; // 상태 초기화 
+                    return;
+                }
+            }
+            else if (isRotate)
+            {
+                isRotate = false;
+            }
+            else
+            {
+                // 원본을 갱신하고 초기 상태로 복원
+                ResetEditScreen();
+                isCroped = false; // 상태 초기화 
+            }
+
+        }
+
+        // 편집 화면 초기화
+        private void ResetEditScreen()
+        {
+            // 배경 색상 초기화
+            Main.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#606060")); ; // 기본 배경색으로 복원
+            ImageSheet.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#808080"));
+
+            // 이미지 확대 상태 초기화
+            ImageScaleTransform.ScaleX = 1.0;
+            ImageScaleTransform.ScaleY = 1.0;
+
+            // 슬라이더와 UI 요소 숨기기
+            Slider.Visibility = Visibility.Collapsed;
+            tools.Visibility = Visibility.Collapsed;
+            rotation.Visibility = Visibility.Collapsed;
+            CompleteButton.Visibility = Visibility.Collapsed;
+
+
+            // 캔버스 숨기기
+            CropCanvas.Visibility = Visibility.Collapsed;
+            SelectionRectangle.Visibility = Visibility.Collapsed;
+
+            // 활성 버튼 초기화
+            if (currentActiveButton != null)
+            {
+                currentActiveButton.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF673AB7")); // 기본 색상
+            }
+            currentActiveButton = null;
+
+            // 저장 버튼 활성화
+            SaveButton.Visibility = Visibility.Visible;
+
+            // 파일박스 활성화
+            FileBox.Visibility = Visibility.Visible;
+        }
+
+        // 버튼 테두리를 업데이트
+        private void UpdateButtonBorder(Button clickedButton, ref Button currentButton)
+        {
+            // 이전 활성 버튼 테두리를 기본 색으로 복원
+            if (currentButton != null)
+            {
+                currentButton.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF673AB7")); // 기본색
+            }
+
+            // 클릭된 버튼의 테두리를 초록색으로 설정
+            clickedButton.BorderBrush = new SolidColorBrush(Colors.LimeGreen);
+
+            // 현재 활성 버튼 업데이트
+            currentButton = clickedButton;
+        }
+
     }
+
 }

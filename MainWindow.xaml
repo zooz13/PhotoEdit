@@ -7,14 +7,14 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="PhotoEdit"  
-        Width="1280" 
-        Height="800" 
+        Width="1366" 
+        Height="768" 
         Background="#606060"
         FontFamily="{DynamicResource MaterialDesignFont}" Foreground="{x:Null}"
 
         >
 
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -63,14 +63,21 @@
                                 Height="150" BorderBrush="{x:Null}">
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" >
                                 <!-- 조절 버튼 -->
-                                <Button Width="50" Height="50" 
-                                         materialDesign:ButtonAssist.CornerRadius="25">
+                                <Button x:Name="AdjustButton"
+                                        Width="50" Height="50" 
+                                        Margin="0,10"
+                                         materialDesign:ButtonAssist.CornerRadius="25" Click="AdjustButton_Click">
                                     <Button.Background>
                                         <ImageBrush ImageSource="pack://application:,,,/Icon/dial.png" Stretch="UniformToFill" />
                                     </Button.Background>
                                 </Button>
                                 <!-- 자르기 버튼-->
-                                <Button Content="버튼 B" Width="50" Height="40" Margin="0,5" />
+                                <Button x:Name="TransferButton" Content="자르기" 
+                                        Width="50"
+                                        Height="50"
+                                        materialDesign:ButtonAssist.CornerRadius="25" 
+                                        Margin="0,10"
+                                        Click="TransferButton_Click" />
                             </StackPanel>
 
                         </materialDesign:Card>
@@ -80,8 +87,8 @@
                 <!-- 이미지 표시 -->
                 <Grid Grid.Column="1">
                     <Border x:Name="ImageSheet"  Background="#808080" >
-                        <Image x:Name="ImageDisplay1" Stretch="Uniform" RenderTransformOrigin="0.5,0.5" 
-                                 MouseWheel="Image_MouseWheel" Margin="20,0">
+                        <Image x:Name="ImageDisplay1" RenderTransformOrigin="0.5,0.5" 
+                             Margin="20,0">
                             <Image.RenderTransform>
                                 <ScaleTransform x:Name="ImageScaleTransform" ScaleX="1" ScaleY="1" />
                             </Image.RenderTransform>
@@ -89,48 +96,83 @@
 
                     </Border>
 
+                    <!-- 새 이미지 버튼 -->
                     <Button x:Name="LoadImgButton" Content="새 이미지" Width="110" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Panel.ZIndex="1" Click="LoadImgButton_Click" 
+                        Panel.ZIndex="100" Click="LoadImgButton_Click" 
                          FontFamily="Montserrat" Foreground="White" BorderBrush="#FF673AB7" Background="#FF673AB7"
                             />
+
+                    <!-- 자를 영역 캔버스 -->
+                    <Canvas x:Name="CropCanvas"                         
+                            MouseWheel="CropCanvas_MouseWheel"
+                            Background="Transparent"
+                            Visibility="Collapsed"
+                            Panel.ZIndex="2">
+                        <Rectangle x:Name="SelectionRectangle"   
+                                   Width="100"
+                                   Height="100"
+                                   Stroke="White"
+                                   StrokeThickness="1"
+                                   Visibility="Visible"
+                                   >
+                            <Rectangle.Fill>
+                                <VisualBrush TileMode="Tile"
+                             Viewport="0,0,0.5,0.5"
+                             ViewportUnits="RelativeToBoundingBox"
+                             Viewbox="0,0,1,1"
+                             ViewboxUnits="RelativeToBoundingBox">
+                                    <VisualBrush.Visual>
+                                        <Canvas>
+                                            <!-- 세로선 -->
+                                            <Line X1="50" Y1="0" X2="50" Y2="100" Stroke="White" StrokeThickness="0.3" />
+
+                                            <!-- 가로선 -->
+                                            <Line X1="0" Y1="50" X2="100" Y2="50" Stroke="White" StrokeThickness="0.3" />
+                                        </Canvas>
+                                    </VisualBrush.Visual>
+                                </VisualBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </Canvas>
+
                 </Grid>
 
-                <!-- 값 조절 -->
-                <Grid x:Name="SliderGrid" Grid.Column="2">
-                    
-                    <!-- 기능-->
 
-                    <Border x:Name="tools">
+                <!-- 값 조절 -->
+                <Grid x:Name="SliderGrid" Grid.Column="2" >
+                    <!-- 기능-->
+                    <Border x:Name="tools" Visibility="Collapsed">
                         <materialDesign:Card x:Name="ToolBox"
                                   Padding="8"
                                   Background="{DynamicResource MaterialDesignDarkSeparatorBackground}"
                                   Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
                                   UniformCornerRadius="17"
-                                    Height="500" BorderBrush="{x:Null}" Margin="38,65,86,64"
+                                    Height="500" BorderBrush="{x:Null}" Margin="46,105,78,104"
                                              Panel.ZIndex="1">
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" >
                                 <!-- 노출 -->
                                 <Button x:Name="ExposureButton" Content="노출" Width="50" Height="50" 
                                      materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" Click="ExposureButton_Click" Background="#FF673AB7" BorderBrush="#FF673AB7"
                                         />
+
                                 <!-- 그림자 -->
                                 <Button x:Name="ShadowButton" Content="그림자" Width="50" Height="50" 
 materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"
                                          Click="ShadowButton_Click"
                                         />
-                                
+
                                 <!-- 밝기 -->
                                 <Button x:Name="BrightnessButton" Content="밝기" Width="50" Height="50" 
      materialDesign:ButtonAssist.CornerRadius="25"  Click="BrightnessButton_Click"  Margin="0,10,0,10"/>
 
                                 <!-- 대비 -->
                                 <Button x:Name="ContrastButton" Content="대비" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ContrastButton_Click" />                              
-                                    
+materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ContrastButton_Click" />
+
                                 <!-- 채도 -->
                                 <Button x:Name="ChromaButton" Content="채도" Width="50" Height="50" 
 materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ChromaButton_Click"/>
-                                
+
                                 <!-- 하이라이트 -->
                                 <Button x:Name="HighlightButton" Content="하이라이트" Width="50" Height="50" 
 materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="HighlightButton_Click"/>
@@ -141,12 +183,41 @@ materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ColorTm
 
                             </StackPanel>
                         </materialDesign:Card>
+                    </Border>
 
+                    <!-- 회전 기능 -->
+                    <Border x:Name="rotation" Visibility="Collapsed">
+                        <materialDesign:Card x:Name="RotationBox"
+                                  Padding="8"
+                                  Background="{DynamicResource MaterialDesignDarkSeparatorBackground}"
+                                  Foreground="{DynamicResource PrimaryHueDarkForegroundBrush}"
+                                  UniformCornerRadius="17"
+                                    Height="300" BorderBrush="{x:Null}" Margin="46,65,78,64"
+                                             Panel.ZIndex="1">
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" >
+                                <!-- 상하대칭 -->
+                                <Button x:Name="FlipButton"  Content="상하대칭" Width="50" Height="50" 
+                                     materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" Background="#FF673AB7" BorderBrush="#FF673AB7" Click="FlipButton_Click"
+                                        />
+                                <!-- 좌우대칭 -->
+                                <Button x:Name="MirrorButton" Content="좌우대칭" Width="50" Height="50" 
+                                    materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  Background="#FF673AB7" BorderBrush="#FF673AB7" Click="MirrorButton_Click"
+                                         />
+                                <!-- 오른쪽 90도 -->
+                                <Button x:Name="RotateRightButton" Content="오른쪽 90도" Width="50" Height="50" 
+                                   materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  Background="#FF673AB7" BorderBrush="#FF673AB7" Click="RotateRightButton_Click"
+                                         />
+                                <!-- 왼쪽 90도 -->
+                                <Button x:Name="RotateLeftButton" Content="왼쪽 90도" Width="50" Height="50" 
+materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  Background="#FF673AB7" BorderBrush="#FF673AB7" Click="RotateLeftButton_Click"      
+                                         />
+                            </StackPanel>
+                        </materialDesign:Card>
                     </Border>
 
 
                     <!-- 슬라이더 -->
-                    <Slider
+                    <Slider                        
     x:Name="Slider" 
      materialDesign:SliderAssist.HideActiveTrack="True"
      Maximum="100"
@@ -156,18 +227,44 @@ materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ColorTm
      TickFrequency="{Binding DiscreteVertical.TickFrequency}"
      TickPlacement="BottomRight"
      Value="0"                         
-   Height="550" Margin="134,40,29,39" Foreground="#FF3D0076"
+   Height="500" Margin="134,40,29,39" Foreground="#FF3D0076"
 ValueChanged="Slider_ValueChanged"
+                        Visibility="Collapsed"
 
    />
+
+
                 </Grid>
             </Grid>
         </Border>
 
 
         <!-- 하단 영역 -->
-        <Border Grid.Row="2">            
+        <Border Grid.Row="2">
         </Border>
+
+
+        <!-- 완료, 저장하기 버튼 -->
+        <Button x:Name="CompleteButton" 
+            Click="CompleteButton_Click"
+            Content="완료" 
+            Width="100" 
+            Height="40"
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Top" 
+            Margin="0,9,10,0" Grid.Row="1"
+            Visibility="Collapsed"    />
+
+        <Button x:Name="SaveButton" 
+    Click="SaveButton_Click"
+    Content="저장하기" 
+    Width="100" 
+    Height="40"
+    HorizontalAlignment="Right" 
+    VerticalAlignment="Top" 
+    Margin="0,9,10,0" Grid.Row="1"
+    Visibility="Collapsed"    />
+
 
     </Grid>
 </Window>
