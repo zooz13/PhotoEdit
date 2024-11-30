@@ -40,10 +40,11 @@ namespace PhotoEdit
         private Option currentOptions = new Option();
         private string currentEffect = "Exposure";
 
-        // 현재 활성화된 버튼을 추적하는 변수
+        // 현재 활성화된 버튼, 효과
         private Button currentActiveButton = null;
         private Button currentOptionButton = null;
 
+        // 크롭, 회전 여부
         private bool isCroped = false;
         private bool isRotate = false;
 
@@ -164,13 +165,13 @@ namespace PhotoEdit
             }
         }
 
-        // 기능 버튼 클릭
+        // 효과 버튼
         private void ExposureButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Exposure";
             UpdateSliderForCurrentEffect();
-
+            UpdateEffectDisplay();
         }
 
         private void ShadowButton_Click(object sender, RoutedEventArgs e)
@@ -178,6 +179,7 @@ namespace PhotoEdit
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Shadow";
             UpdateSliderForCurrentEffect();
+            UpdateEffectDisplay();
         }
 
         private void BrightnessButton_Click(object sender, RoutedEventArgs e)
@@ -185,6 +187,7 @@ namespace PhotoEdit
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Brightness";
             UpdateSliderForCurrentEffect();
+            UpdateEffectDisplay();
         }
 
         private void ContrastButton_Click(object sender, RoutedEventArgs e)
@@ -192,6 +195,7 @@ namespace PhotoEdit
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Contrast";
             UpdateSliderForCurrentEffect();
+            UpdateEffectDisplay();
         }
 
         private void HighlightButton_Click(object sender, RoutedEventArgs e)
@@ -199,6 +203,7 @@ namespace PhotoEdit
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Highlight";
             UpdateSliderForCurrentEffect();
+            UpdateEffectDisplay();
         }
 
         private void ChromaButton_Click(object sender, RoutedEventArgs e)
@@ -206,6 +211,7 @@ namespace PhotoEdit
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "Chroma";
             UpdateSliderForCurrentEffect();
+            UpdateEffectDisplay();
         }
 
         private void ColorTmpButton_Click(object sender, RoutedEventArgs e)
@@ -213,6 +219,7 @@ namespace PhotoEdit
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
             currentEffect = "ColorTmp";
             UpdateSliderForCurrentEffect();
+            UpdateEffectDisplay();
         }
 
         private void FlipButton_Click(object sender, RoutedEventArgs e)
@@ -296,6 +303,7 @@ namespace PhotoEdit
 
             isRotate = true;
         }
+        
         // 버튼 클릭 시 해당 효과에 맞는 슬라이더 값 업데이트
         private void UpdateSliderForCurrentEffect()
         {
@@ -668,6 +676,8 @@ namespace PhotoEdit
                 currentEffect = "Exposure";
                 Slider.Visibility = Visibility.Visible;
                 tools.Visibility = Visibility.Visible;
+                EffectDisplay.Visibility = Visibility.Visible;
+                UpdateEffectDisplay();
 
                 // 숨기기
                 CropCanvas.Visibility = Visibility.Collapsed;
@@ -681,6 +691,7 @@ namespace PhotoEdit
                 Slider.Visibility = Visibility.Visible;
 
                 // 숨기기
+                EffectDisplay.Visibility = Visibility.Collapsed;
                 tools.Visibility = Visibility.Collapsed;
                 ShowSelectionRectangle();
             }
@@ -795,8 +806,8 @@ namespace PhotoEdit
             }
 
             // 캔버스 크기 설정
-            CropCanvas.Width = displayedSize.Width * 1.05;
-            CropCanvas.Height = displayedSize.Height * 1.05;
+            CropCanvas.Width = displayedSize.Width;
+            CropCanvas.Height = displayedSize.Height;
 
             // 사각형 크기 설정
             SelectionRectangle.Width = displayedSize.Width * 1.05;
@@ -814,7 +825,7 @@ namespace PhotoEdit
         // 사각형 크기 조절
         private void CropCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            const double zoomFactor = 0.03; // 크기 조정 비율 (10%씩 확대/축소)
+            const double zoomFactor = 0.03; // 크기 조정 비율 (3%씩 확대/축소)
             double delta = e.Delta > 0 ? 1 + zoomFactor : 1 - zoomFactor; // 휠 방향에 따라 확대 또는 축소
 
             // 표시된 이미지의 크기 가져오기
@@ -826,26 +837,22 @@ namespace PhotoEdit
 
             // 크기 제한 계산
             const double minSize = 100; // 최소 크기
-            double maxWidth = displayedSize.Width * 1.05; // 이미지 너비를 최대값으로 설정
-            double maxHeight = displayedSize.Height * 1.05; // 이미지 높이를 최대값으로 설정
+            double maxWidth = displayedSize.Width * 1.05; // 최대 너비
+            double maxHeight = displayedSize.Height * 1.05; // 최대 높이
 
-            // 새로운 캔버스 크기 계산
-            double newWidth = CropCanvas.Width * delta;
-            double newHeight = CropCanvas.Height * delta;
+            // 새로운 사각형 크기 계산
+            double newWidth = SelectionRectangle.Width * delta;
+            double newHeight = SelectionRectangle.Height * delta;
 
             // 크기 제한 적용
             newWidth = Math.Clamp(newWidth, minSize, maxWidth);
             newHeight = Math.Clamp(newHeight, minSize, maxHeight);
 
-            // 캔버스 크기 설정
-            CropCanvas.Width = newWidth;
-            CropCanvas.Height = newHeight;
-
-            // 선택 사각형 크기도 동일 비율로 조정
+            // 선택 사각형 크기 업데이트
             SelectionRectangle.Width = newWidth;
             SelectionRectangle.Height = newHeight;
 
-            // 선택 사각형을 캔버스 중앙에 유지
+            // 선택 사각형을 캔버스 중앙으로 재정렬
             Canvas.SetLeft(SelectionRectangle, (CropCanvas.Width - SelectionRectangle.Width) / 2);
             Canvas.SetTop(SelectionRectangle, (CropCanvas.Height - SelectionRectangle.Height) / 2);
 
@@ -962,6 +969,9 @@ namespace PhotoEdit
             CropCanvas.Visibility = Visibility.Collapsed;
             SelectionRectangle.Visibility = Visibility.Collapsed;
 
+            // 텍스트 숨기기
+            EffectDisplay.Visibility = Visibility.Collapsed; 
+
             // 활성 버튼 초기화
             if (currentActiveButton != null)
             {
@@ -976,7 +986,7 @@ namespace PhotoEdit
             FileBox.Visibility = Visibility.Visible;
         }
 
-        // 버튼 테두리를 업데이트
+        // 버튼 활성화 
         private void UpdateButtonBorder(Button clickedButton, ref Button currentButton)
         {
             // 이전 활성 버튼 테두리를 기본 색으로 복원
@@ -992,6 +1002,22 @@ namespace PhotoEdit
             currentButton = clickedButton;
         }
 
-    }
+        // 현재 선택 효과 표시
+        private void UpdateEffectDisplay()
+        {
+            string effectDisplayText = currentEffect switch
+            {
+                "Exposure" => "노출",
+                "Shadow" => "그림자",
+                "Brightness" => "밝기",
+                "Contrast" => "대비",
+                "Chroma" => "채도",
+                "Highlight" => "하이라이트",
+                "ColorTmp" => "색온도",
+                "Rotate" => "회전",  
+            };
 
+            EffectDisplay.Content = effectDisplayText;
+        }
+    }    
 }

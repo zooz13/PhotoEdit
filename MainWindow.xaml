@@ -7,11 +7,14 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="PhotoEdit"  
-        Width="1366" 
-        Height="768" 
+        Width="1600" 
+        Height="900" 
+        MinWidth="1366"
+        MinHeight="820"
+        WindowStartupLocation="CenterScreen"
         Background="#606060"
-        FontFamily="{DynamicResource MaterialDesignFont}" Foreground="{x:Null}"
-
+        FontFamily="{DynamicResource MaterialDesignFont}" 
+        Foreground="{x:Null}"
         >
 
 
@@ -66,18 +69,22 @@
                                 <Button x:Name="AdjustButton"
                                         Width="50" Height="50" 
                                         Margin="0,10"
-                                         materialDesign:ButtonAssist.CornerRadius="25" Click="AdjustButton_Click">
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="pack://application:,,,/Icon/dial.png" Stretch="UniformToFill" />
-                                    </Button.Background>
+                                        materialDesign:ButtonAssist.CornerRadius="25"
+                                        Padding="10"
+                                        Click="AdjustButton_Click" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/dial4.png" Stretch="Uniform" />
                                 </Button>
                                 <!-- 자르기 버튼-->
-                                <Button x:Name="TransferButton" Content="자르기" 
+                                <Button x:Name="TransferButton" 
                                         Width="50"
                                         Height="50"
+                                        Padding="10"
                                         materialDesign:ButtonAssist.CornerRadius="25" 
                                         Margin="0,10"
-                                        Click="TransferButton_Click" />
+                                        Background="{x:Null}"
+                                        Click="TransferButton_Click">
+                                    <Image Source="pack://application:,,,/Icon/crop2.png" Stretch="Uniform" />
+                                </Button>
                             </StackPanel>
 
                         </materialDesign:Card>
@@ -86,7 +93,7 @@
 
                 <!-- 이미지 표시 -->
                 <Grid Grid.Column="1">
-                    <Border x:Name="ImageSheet"  Background="#808080" >
+                    <Border x:Name="ImageSheet"  Background="#808080" Margin="0,1.6,0,0" >
                         <Image x:Name="ImageDisplay1" RenderTransformOrigin="0.5,0.5" 
                              Margin="20,0">
                             <Image.RenderTransform>
@@ -101,6 +108,21 @@
                         Panel.ZIndex="100" Click="LoadImgButton_Click" 
                          FontFamily="Montserrat" Foreground="White" BorderBrush="#FF673AB7" Background="#FF673AB7"
                             />
+
+                    <!-- 현재 효과 표시 -->
+                    <Button x:Name="EffectDisplay"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Margin="0,10,0,0"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Background="#808080"
+                            BorderBrush="Transparent"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="Collapsed"/>
 
                     <!-- 자를 영역 캔버스 -->
                     <Canvas x:Name="CropCanvas"                         
@@ -151,35 +173,53 @@
                                              Panel.ZIndex="1">
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" >
                                 <!-- 노출 -->
-                                <Button x:Name="ExposureButton" Content="노출" Width="50" Height="50" 
-                                     materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" Click="ExposureButton_Click" Background="#FF673AB7" BorderBrush="#FF673AB7"
-                                        />
+                                <Button x:Name="ExposureButton" Width="50" Height="50"
+                                    materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" Padding="10"
+                                    Click="ExposureButton_Click" BorderBrush="#FF673AB7" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/exposure1.png" Stretch="Uniform" />
+                                </Button>
 
                                 <!-- 그림자 -->
-                                <Button x:Name="ShadowButton" Content="그림자" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"
-                                         Click="ShadowButton_Click"
-                                        />
+                                <Button x:Name="ShadowButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10"
+                                         Click="ShadowButton_Click" Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/shadow1.png" Stretch="Uniform" />
+                                </Button>
 
                                 <!-- 밝기 -->
-                                <Button x:Name="BrightnessButton" Content="밝기" Width="50" Height="50" 
-     materialDesign:ButtonAssist.CornerRadius="25"  Click="BrightnessButton_Click"  Margin="0,10,0,10"/>
+                                <Button x:Name="BrightnessButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25"  Click="BrightnessButton_Click"  Margin="0,10,0,10"
+                                         Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/brightness2.png" Stretch="Uniform" />
+                                </Button>
 
                                 <!-- 대비 -->
-                                <Button x:Name="ContrastButton" Content="대비" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ContrastButton_Click" />
+                                <Button x:Name="ContrastButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ContrastButton_Click"
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/contrast2.png" Stretch="Uniform" />
+                                </Button>
 
                                 <!-- 채도 -->
-                                <Button x:Name="ChromaButton" Content="채도" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ChromaButton_Click"/>
+                                <Button x:Name="ChromaButton"  Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ChromaButton_Click"
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/chroma1.png" Stretch="Uniform" />
+                                </Button>
 
                                 <!-- 하이라이트 -->
-                                <Button x:Name="HighlightButton" Content="하이라이트" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="HighlightButton_Click"/>
+                                <Button x:Name="HighlightButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="HighlightButton_Click"
+                                        Padding="8" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/highlight1.png" Stretch="Uniform" />
+                                </Button>
 
                                 <!-- 색온도 -->
-                                <Button x:Name="ColorTmpButton" Content="색온도" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ColorTmpButton_Click" />
+                                <Button x:Name="ColorTmpButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ColorTmpButton_Click"
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/temp1.png" Stretch="Uniform" />
+                                </Button>
 
                             </StackPanel>
                         </materialDesign:Card>
@@ -196,21 +236,29 @@ materialDesign:ButtonAssist.CornerRadius="25"  Margin="0,10,0,10" Click="ColorTm
                                              Panel.ZIndex="1">
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" >
                                 <!-- 상하대칭 -->
-                                <Button x:Name="FlipButton"  Content="상하대칭" Width="50" Height="50" 
-                                     materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" Background="#FF673AB7" BorderBrush="#FF673AB7" Click="FlipButton_Click"
-                                        />
+                                <Button x:Name="FlipButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" BorderBrush="#FF673AB7" Click="FlipButton_Click"
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/vertical.png" Stretch="Uniform" />
+                                </Button>
                                 <!-- 좌우대칭 -->
-                                <Button x:Name="MirrorButton" Content="좌우대칭" Width="50" Height="50" 
-                                    materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  Background="#FF673AB7" BorderBrush="#FF673AB7" Click="MirrorButton_Click"
-                                         />
+                                <Button x:Name="MirrorButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" BorderBrush="#FF673AB7" Click="MirrorButton_Click"
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/horizon.png" Stretch="Uniform" />
+                                </Button>
                                 <!-- 오른쪽 90도 -->
-                                <Button x:Name="RotateRightButton" Content="오른쪽 90도" Width="50" Height="50" 
-                                   materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  Background="#FF673AB7" BorderBrush="#FF673AB7" Click="RotateRightButton_Click"
-                                         />
+                                <Button x:Name="RotateRightButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  BorderBrush="#FF673AB7" Click="RotateRightButton_Click"
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/right.png" Stretch="Uniform" />
+                                </Button>
                                 <!-- 왼쪽 90도 -->
-                                <Button x:Name="RotateLeftButton" Content="왼쪽 90도" Width="50" Height="50" 
-materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10"  Background="#FF673AB7" BorderBrush="#FF673AB7" Click="RotateLeftButton_Click"      
-                                         />
+                                <Button x:Name="RotateLeftButton" Width="50" Height="50" 
+                                        materialDesign:ButtonAssist.CornerRadius="25" Margin="0,10,0,10" BorderBrush="#FF673AB7" Click="RotateLeftButton_Click"      
+                                        Padding="10" Background="{x:Null}">
+                                    <Image Source="pack://application:,,,/Icon/left.png" Stretch="Uniform" />
+                                </Button>
                             </StackPanel>
                         </materialDesign:Card>
                     </Border>
@@ -264,6 +312,7 @@ ValueChanged="Slider_ValueChanged"
     VerticalAlignment="Top" 
     Margin="0,9,10,0" Grid.Row="1"
     Visibility="Collapsed"    />
+
 
 
     </Grid>

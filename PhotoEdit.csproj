@@ -9,8 +9,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icon\brightness2.png" />
+    <None Remove="Icon\chroma1.png" />
+    <None Remove="Icon\contrast2.png" />
+    <None Remove="Icon\crop1.png" />
+    <None Remove="Icon\crop2.png" />
     <None Remove="Icon\dial.png" />
+    <None Remove="Icon\dial2.png" />
+    <None Remove="Icon\dial3.png" />
+    <None Remove="Icon\dial4.png" />
     <None Remove="Icon\dialIcon.jpeg" />
+    <None Remove="Icon\exposure1.png" />
+    <None Remove="Icon\highlight1.png" />
+    <None Remove="Icon\horizon.png" />
+    <None Remove="Icon\horizontal.png" />
+    <None Remove="Icon\left.png" />
+    <None Remove="Icon\right.png" />
+    <None Remove="Icon\shadow1.png" />
+    <None Remove="Icon\temp1.png" />
+    <None Remove="Icon\verical.png" />
+    <None Remove="Icon\vertical.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +39,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icon\brightness2.png" />
+    <Resource Include="Icon\chroma1.png" />
+    <Resource Include="Icon\contrast2.png" />
+    <Resource Include="Icon\crop1.png" />
+    <Resource Include="Icon\crop2.png" />
     <Resource Include="Icon\dial.png" />
+    <Resource Include="Icon\dial2.png" />
+    <Resource Include="Icon\dial3.png" />
+    <Resource Include="Icon\dial4.png" />
+    <Resource Include="Icon\exposure1.png" />
+    <Resource Include="Icon\highlight1.png" />
+    <Resource Include="Icon\horizon.png" />
+    <Resource Include="Icon\left.png" />
+    <Resource Include="Icon\right.png" />
+    <Resource Include="Icon\shadow1.png" />
+    <Resource Include="Icon\temp1.png" />
+    <Resource Include="Icon\vertical.png" />
   </ItemGroup>
 
 </Project>
