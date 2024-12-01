@@ -34,11 +34,15 @@ namespace PhotoEdit
     public partial class MainWindow : System.Windows.Window
     {
         private Mat originalImage; // 원본 이미지
-        private Mat currentImage; // 현재 이미지 (OpenCV Mat)
+        private Mat currentImage; // 현재 이미지
         private string currentFilePath; // 현재 파일 경로
 
         private Option currentOptions = new Option();
         private string currentEffect = "Exposure";
+        private string prevEffect = "Exposure";
+
+        private int angle = 0;
+
 
         // 현재 활성화된 버튼, 효과
         private Button currentActiveButton = null;
@@ -68,9 +72,9 @@ namespace PhotoEdit
                 try
                 {
                     currentFilePath = openFileDialog.FileName;
-                    originalImage = Cv2.ImRead(currentFilePath); // OpenCV Mat로 이미지 읽기
+                    originalImage = Cv2.ImRead(currentFilePath); // 이미지 읽기
                     currentImage = originalImage.Clone();
-                    ImageDisplay1.Source = MatToBitmapImage(currentImage); // WPF에 표시
+                    ImageDisplay1.Source = MatToBitmapImage(currentImage);
 
                     // 저장 버튼 비활성화
                     SaveButton.Visibility = Visibility.Collapsed;
@@ -100,6 +104,7 @@ namespace PhotoEdit
             };
 
             currentEffect = "Exposure"; // 기본 효과 설정
+            prevEffect = "Exposure"; // 기본 효과 설정
         }
 
         // 다른 이름으로 저장하기
@@ -135,7 +140,7 @@ namespace PhotoEdit
             SaveAsImage(sender, e);
         }
 
-        // OpenCV Mat → BitmapImage 변환
+        // BitmapImage로 변환
         private BitmapImage MatToBitmapImage(Mat mat)
         {
             using (var bitmap = mat.ToBitmap())
@@ -169,6 +174,7 @@ namespace PhotoEdit
         private void ExposureButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "Exposure";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -177,6 +183,7 @@ namespace PhotoEdit
         private void ShadowButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "Shadow";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -185,6 +192,7 @@ namespace PhotoEdit
         private void BrightnessButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "Brightness";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -193,6 +201,7 @@ namespace PhotoEdit
         private void ContrastButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "Contrast";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -201,6 +210,7 @@ namespace PhotoEdit
         private void HighlightButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "Highlight";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -209,6 +219,7 @@ namespace PhotoEdit
         private void ChromaButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "Chroma";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -217,6 +228,7 @@ namespace PhotoEdit
         private void ColorTmpButton_Click(object sender, RoutedEventArgs e)
         {
             UpdateButtonBorder((Button)sender, ref currentOptionButton);
+            prevEffect = currentEffect;
             currentEffect = "ColorTmp";
             UpdateSliderForCurrentEffect();
             UpdateEffectDisplay();
@@ -229,15 +241,14 @@ namespace PhotoEdit
                 return;
             }
 
-            // 상하 대칭
             Mat flippedImage = new Mat();
             Cv2.Flip(currentImage, flippedImage, FlipMode.X);
 
             currentImage = flippedImage.Clone();
             ImageDisplay1.Source = MatToBitmapImage(flippedImage);
 
-            // 원본 이미지 업데이트 여부 (선택 사항)
-            Cv2.Flip(originalImage, flippedImage, FlipMode.X); // 0은 상하 대칭
+            // 원본 업데이트
+            Cv2.Flip(originalImage, flippedImage, FlipMode.X);
             originalImage = flippedImage.Clone();
 
             isRotate = true;
@@ -250,7 +261,6 @@ namespace PhotoEdit
                 return;
             }
 
-            // 좌우 대칭 처리
             Mat flippedImage = new Mat();
             Cv2.Flip(currentImage, flippedImage, FlipMode.Y);
 
@@ -404,8 +414,8 @@ namespace PhotoEdit
         // 노출 변경 (감마값 기반)
         private Mat ApplyExposure(Mat inputImage, int exposureValue)
         {
-            // 감마 조정 값 계산 (슬라이더 값: -100 ~ 100 → 감마 범위: 0.5 ~ 1.5)
-            double gamma = 1.0 - (exposureValue * 0.005); // 감마값 계산
+            // 감마 조정 값 계산
+            double gamma = 1.0 - (exposureValue * 0.005); // 감마값
 
 
             // LUT(룩업 테이블) 생성
@@ -427,7 +437,7 @@ namespace PhotoEdit
         // 밝기 변경
         private Mat ApplyBrightness(Mat inputImage, int brightnessValue)
         {
-            // 밝기 조정 값 계산 (슬라이더 값: -100 ~ 100)
+            // 밝기 조정 값 계산
             double brightnessAdjustment = brightnessValue * 0.5;
 
             // 부동 소수점 형식으로 변환 (연산을 위해)
@@ -463,7 +473,7 @@ namespace PhotoEdit
 
             // 히스토그램 평균을 기반으로 임계값 설정
             Scalar mean = Cv2.Mean(intensity);
-            double thresholdValue = mean.Val0 * 0.3; // 평균값의 30%를 임계값으로 설정
+            double thresholdValue = mean.Val0 * 0.3; // 임계값 설정
 
             // 어두운 영역 마스크 생성
             Mat mask = new Mat();
@@ -524,7 +534,7 @@ namespace PhotoEdit
             Cv2.Threshold(intensity, mask, highlightThreshold, 255, ThresholdTypes.Binary);
 
             // 하이라이트 강도 조정
-            double highlightAdjustment = highlightValue * 0.2; // 강도 증가
+            double highlightAdjustment = highlightValue * 0.2; 
             Mat adjustedImage = new Mat();
             Mat[] channels = Cv2.Split(floatImage);
 
@@ -547,9 +557,9 @@ namespace PhotoEdit
         // 대비 변경
         private Mat ApplyContrast(Mat inputImage, int contrastValue)
         {
-            // 대비 조정 값 계산 (슬라이더 값: -100 ~ 100 → 조정 강도)
-            double contrastFactor = 1.0 + (contrastValue / 250.0); // -100 ~ 100 -> 0.0 ~ 2.0
-            contrastFactor = Math.Clamp(contrastFactor, 0.0, 3.0); // 대비 조정 범위 제한 (0.0 ~ 3.0)
+            // 대비 조정 값 계산
+            double contrastFactor = 1.0 + (contrastValue / 250.0);
+            contrastFactor = Math.Clamp(contrastFactor, 0.0, 3.0); // 대비 조정 범위 제한
 
             // 이미지 평균값 계산 (중립 점 설정)
             Scalar mean = Cv2.Mean(inputImage);
@@ -570,9 +580,9 @@ namespace PhotoEdit
         // 채도변경
         private Mat ApplyChroma(Mat inputImage, int chromaValue)
         {
-            // 슬라이더 값 (-100 ~ 100)을 이용해 채도 조정 비율 계산
-            double chromaFactor = 1.0 + (chromaValue / 100.0); // -100 ~ 100 → 0.0 ~ 2.0
-            chromaFactor = Math.Clamp(chromaFactor, 0.0, 2.0); // 채도 조정 범위 제한 (0.0 ~ 2.0)
+            // 채도 조정 비율 계산
+            double chromaFactor = 1.0 + (chromaValue / 100.0); 
+            chromaFactor = Math.Clamp(chromaFactor, 0.0, 2.0); // 채도 조정 범위 제한
 
             // BGR 이미지를 HSV 색 공간으로 변환
             Mat hsvImage = new Mat();
@@ -607,7 +617,6 @@ namespace PhotoEdit
             double redAdjustment = 1.0 + (tempValue * 0.005); // 온도를 높이면 빨간색 강화
             double blueAdjustment = 1.0 - (tempValue * 0.005); // 온도를 낮추면 파란색 강화
 
-            // 가중치 클램핑 (0.0 ~ 2.0 범위)
             redAdjustment = Math.Clamp(redAdjustment, 0.0, 1.0);
             blueAdjustment = Math.Clamp(blueAdjustment, 0.0, 1.0);
 
@@ -646,7 +655,10 @@ namespace PhotoEdit
         // 슬라이더 초기 설정
         private void SetSliderValue()
         {
-            if (currentActiveButton == TransferButton)
+            // 슬라이더 값 변경 시 이벤트 일시적으로 비활성화
+            Slider.ValueChanged -= Slider_ValueChanged;
+
+            if (currentEffect == "Rotate")
             {
                 Slider.Minimum = -45;
                 Slider.Maximum = 45;
@@ -657,11 +669,26 @@ namespace PhotoEdit
             {
                 Slider.Minimum = -100;
                 Slider.Maximum = 100;
-                Slider.Value = 0;
-                Slider.Height = 550;
 
+                // currentEffect에 따라 슬라이더 값 설정
+                Slider.Value = currentEffect switch
+                {
+                    "Exposure" => currentOptions.Exposure,
+                    "Shadow" => currentOptions.Shadow,
+                    "Brightness" => currentOptions.Brightness,
+                    "Contrast" => currentOptions.Contrast,
+                    "Chroma" => currentOptions.Chroma,
+                    "Highlight" => currentOptions.Highlight,
+                    "ColorTmp" => currentOptions.ColorTmp,
+                };
+
+                Slider.Height = 550;
             }
+
+            // 슬라이더 값 변경 시 이벤트 다시 활성화
+            Slider.ValueChanged += Slider_ValueChanged;
         }
+
 
         // 표시할 기능 설정
         private void SetVisible()
@@ -673,7 +700,6 @@ namespace PhotoEdit
             if (currentActiveButton == AdjustButton)
             {
                 // 활성화
-                currentEffect = "Exposure";
                 Slider.Visibility = Visibility.Visible;
                 tools.Visibility = Visibility.Visible;
                 EffectDisplay.Visibility = Visibility.Visible;
@@ -707,14 +733,21 @@ namespace PhotoEdit
 
             UpdateButtonBorder((Button)sender, ref currentActiveButton);
 
-            // 슬라이더 초기화
+            if(currentEffect == "Exposure")
+            {
+                UpdateButtonBorder(ExposureButton, ref currentOptionButton);
+            }
+            currentEffect = prevEffect;
+ 
             SetSliderValue();
 
             SetVisible();
-
-            // 화면을 검은색으로 설정
             AcitvateEditScreen();
+
+            UpdateEffectDisplay();
+            UpdateSliderForCurrentEffect();
         }
+
 
         // 자르기 및 회전 버튼
         private void TransferButton_Click(object sender, RoutedEventArgs e)
@@ -725,6 +758,11 @@ namespace PhotoEdit
             }
 
             UpdateButtonBorder((Button)sender, ref currentActiveButton);
+
+            if (currentEffect != "Rotate")
+            {
+                prevEffect = currentEffect;
+            }
 
             currentEffect = "Rotate";
 
@@ -749,7 +787,6 @@ namespace PhotoEdit
             // 회전 매트릭스 생성
             Mat rotationMatrix = Cv2.GetRotationMatrix2D(center, angle, 1.0);
 
-            // 회전된 이미지 저장 변수
             Mat rotatedImage = new Mat();
 
             // WarpAffine으로 이미지 회전
@@ -825,14 +862,14 @@ namespace PhotoEdit
         // 사각형 크기 조절
         private void CropCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            const double zoomFactor = 0.03; // 크기 조정 비율 (3%씩 확대/축소)
+            const double zoomFactor = 0.03; // 크기 조정 비율
             double delta = e.Delta > 0 ? 1 + zoomFactor : 1 - zoomFactor; // 휠 방향에 따라 확대 또는 축소
 
             // 표시된 이미지의 크기 가져오기
             System.Windows.Size displayedSize = GetDisplayedImageSize();
             if (displayedSize.Width <= 0 || displayedSize.Height <= 0)
             {
-                return; // 이미지가 없는 경우 처리하지 않음
+                return;
             }
 
             // 크기 제한 계산
@@ -864,7 +901,6 @@ namespace PhotoEdit
         {
             if (currentImage == null || CropCanvas.Visibility != Visibility.Visible)
             {
-                MessageBox.Show("이미지가 로드되지 않았거나 자르기 사각형이 비활성화되었습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
 
@@ -872,7 +908,6 @@ namespace PhotoEdit
             System.Windows.Size displayedSize = GetDisplayedImageSize();
             if (displayedSize.Width <= 0 || displayedSize.Height <= 0)
             {
-                MessageBox.Show("이미지가 올바르게 표시되지 않았습니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
                 return null;
             }
 
@@ -892,13 +927,11 @@ namespace PhotoEdit
             int cropWidth = (int)(rectWidth * widthRatio);
             int cropHeight = (int)(rectHeight * heightRatio);
 
-            // 자르기 영역이 원본 이미지의 범위를 초과하지 않도록 제한
             cropX = Math.Clamp(cropX, 0, originalImage.Width - 1);
             cropY = Math.Clamp(cropY, 0, originalImage.Height - 1);
             cropWidth = Math.Clamp(cropWidth, 1, originalImage.Width - cropX);
             cropHeight = Math.Clamp(cropHeight, 1, originalImage.Height - cropY);
 
-            // OpenCV Rect 생성
             Rect cropRect = new Rect(cropX, cropY, cropWidth, cropHeight);
 
             // 이미지 자르기

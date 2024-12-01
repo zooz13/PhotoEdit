@@ -44,7 +44,6 @@
     <Resource Include="Icon\contrast2.png" />
     <Resource Include="Icon\crop1.png" />
     <Resource Include="Icon\crop2.png" />
-    <Resource Include="Icon\dial.png" />
     <Resource Include="Icon\dial2.png" />
     <Resource Include="Icon\dial3.png" />
     <Resource Include="Icon\dial4.png" />
@@ -57,5 +56,4 @@
     <Resource Include="Icon\temp1.png" />
     <Resource Include="Icon\vertical.png" />
   </ItemGroup>
-
 </Project>
