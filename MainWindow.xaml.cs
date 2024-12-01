@@ -41,9 +41,6 @@ namespace PhotoEdit
         private string currentEffect = "Exposure";
         private string prevEffect = "Exposure";
 
-        private int angle = 0;
-
-
         // 현재 활성화된 버튼, 효과
         private Button currentActiveButton = null;
         private Button currentOptionButton = null;
